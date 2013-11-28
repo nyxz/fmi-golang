@@ -25,27 +25,18 @@ var rotation map[int]int = map[int]int {
 }
 
 func (dragon *DragonFractal) Next() (rightDirection string) {
-	fmt.Println("index: ", dragon.currIndex, ", generation len: ", len(dragon.generation))
 	if dragon.currIndex == len(dragon.generation) {
-		fmt.Println(dragon.generation)
 		dragon.populateNextGeneration()
 	}
-	rightDirection = direction[dragon.currIndex]
+	rightDirection = direction[dragon.generation[dragon.currIndex]]
 	dragon.currIndex++
 	return
 }
 
 func (dragon *DragonFractal) populateNextGeneration() {
-	fmt.Println("Populating new generation...")
-	oldGen := dragon.generation
-	dragon.generation = make([]int, len(oldGen), 2 * cap(oldGen))
-    copy(dragon.generation, oldGen)
-
-	fmt.Println(oldGen)
-	fmt.Println(dragon.generation)
-	bias := len(dragon.generation)
-	for i := 0; i < len(oldGen); i++ {
-		dragon.generation[i + bias] = rotateDirection(oldGen[i])
+	genSize := len(dragon.generation)
+	for revIdx := genSize - 1; revIdx >= 0 ; revIdx-- {
+		dragon.generation = append(dragon.generation, rotateDirection(dragon.generation[revIdx]))
 	}
 }
 
@@ -54,8 +45,12 @@ func rotateDirection(direction int) int {
 }
 
 func main() {
-	make([]int, 0, 1)
-	dragon := DragonFractal{0, make([]int, 0, 1)} 
+	dragon := DragonFractal{0, make([]int, 1, 1)} // for default up direction
+	fmt.Println(dragon.Next())
+	fmt.Println(dragon.Next())
+	fmt.Println(dragon.Next())
+	fmt.Println(dragon.Next())
+	fmt.Println(dragon.Next())
 	fmt.Println(dragon.Next())
 	fmt.Println(dragon.Next())
 	fmt.Println(dragon.Next())
