@@ -22,7 +22,13 @@ var rotation map[int]int = map[int]int {
 	3 : 2, // left -> down
 }
 
+const DEFAULT_DIRECTION int = 0 // up
+
 func (dragon *DragonFractal) Next() (rightDirection string) {
+	if dragon.shouldInit() {
+		rightDirection = dragon.init()
+		return
+	}
 	dragon.updateRotationPoint()
 	rotatedPoint := dragon.getRotatedPoint()
 
@@ -33,6 +39,12 @@ func (dragon *DragonFractal) Next() (rightDirection string) {
 	return
 }
 
+func (dragon *DragonFractal) updateRotationPoint() {
+	if isPowerOf2(dragon.currStep + 1) {
+		dragon.rotationPoint = dragon.currStep
+	}
+}
+
 func (dragon *DragonFractal) getRotatedPoint() (rotatedPoint int) {
 	diff := dragon.currStep - dragon.rotationPoint
 	mirrorPoint := dragon.generation[dragon.rotationPoint - diff]
@@ -40,10 +52,15 @@ func (dragon *DragonFractal) getRotatedPoint() (rotatedPoint int) {
 	return
 }
 
-func (dragon *DragonFractal) updateRotationPoint() {
-	if isPowerOf2(dragon.currStep + 1) {
-		dragon.rotationPoint = dragon.currStep
-	}
+func (dragon *DragonFractal) shouldInit() bool {
+	return dragon.generation == nil
+}
+
+func (dragon *DragonFractal) init() (initDirection string) {
+	dragon.generation = make([]int, 1, 1)
+	dragon.generation[0] = DEFAULT_DIRECTION
+	initDirection = direction[DEFAULT_DIRECTION]
+	return
 }
 
 func isPowerOf2(x int) bool {
@@ -55,8 +72,10 @@ func rotateDirection(direction int) int {
 }
 
 func main() {
-	// len = 1 for default UP direction
-	dragon := DragonFractal{0, 0, make([]int, 1, 1)}
+	dragon := DragonFractal{
+		currStep : 0,
+		rotationPoint : 0,
+		generation : nil}
 	fmt.Println(dragon.Next())
 	fmt.Println(dragon.Next())
 	fmt.Println(dragon.Next())
